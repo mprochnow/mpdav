@@ -44,10 +44,9 @@ class FileIterator(object):
         self.filename = filename
 
     def __iter__(self):
-        st = os.stat(self.filename)
+        remaining = os.stat(self.filename).st_size
         f = open(self.filename, "rb")
 
-        remaining = st.st_size
         while remaining > 0:
             r = min(remaining, BLOCK_SIZE)
 
@@ -91,9 +90,7 @@ class FileBackend(object):
         raise IOError
 
     def _show(self, filename):
-        if not self.show_hidden and filename.startswith("."):
-            return False
-        return True
+        return self.show_hidden or not filename.startswith(".")
 
     def _get_properties(self, paths, request_xml):
         result = []
@@ -120,12 +117,14 @@ class FileBackend(object):
                 elif property_ == "displayname":
                     prop_stat.add_displayname(name)
 
-                elif property_ == "getcontentlength" and not is_dir:
-                    prop_stat.add_getcontentlength(st.st_size)
+                elif property_ == "getcontentlength":
+                    if not is_dir:
+                        prop_stat.add_getcontentlength(st.st_size)
 
-                elif property_ == "getcontenttype" and not is_dir:
-                    ct = mimetypes.guess_type(p)[0] or "application/octet-stream"
-                    prop_stat.add_getcontenttype(ct)
+                elif property_ == "getcontenttype":
+                    if not is_dir:
+                        ct = mimetypes.guess_type(p)[0] or "application/octet-stream"
+                        prop_stat.add_getcontenttype(ct)
 
                 elif property_ == "getetag":
                     prop_stat.add_getetag(md5.new("%s%s" % (name.encode("utf-8"), st.st_mtime)).hexdigest())
@@ -138,6 +137,9 @@ class FileBackend(object):
 
                 elif property_ == "quota-used-bytes":
                     prop_stat.add_quota_used_bytes((fs_st.f_blocks - fs_st.f_bavail) * fs_st.f_frsize)
+
+                else:
+                    print "Request for not supported property %s" % property_
 
             result.append(multi_status.Response(p[len(self.root):], prop_stat))
 

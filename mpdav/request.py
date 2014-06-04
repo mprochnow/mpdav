@@ -39,8 +39,6 @@ class RequestHandler(object):
         self.backend = backend
 
     def handle(self, method, host, path, headers, body):
-        path = urllib.unquote(path).decode("utf-8")
-
         func = getattr(self, "do_" + method, None)
         if func:
             try:
@@ -49,7 +47,7 @@ class RequestHandler(object):
                 import traceback
                 print traceback.format_exc()
 
-                return response.Response(status.NOT_IMPLEMENTED)
+                return response.Response(status.INTERVAL_SERVER_ERROR)
         else:
             return response.Response(status.NOT_IMPLEMENTED)
 
@@ -65,7 +63,7 @@ class RequestHandler(object):
 
         # TODO if content-length 0 and no body => assume allprop
 
-        content_length = int(headers.get("Content-Length"))
+        content_length = int(headers.get("Content-Length", 0))
 
         request_xml = RequestXml(body.read(content_length))
 
