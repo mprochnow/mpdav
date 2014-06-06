@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with mpdav.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
+import sys
 import urllib
 import urlparse
 
@@ -24,17 +27,6 @@ from davxml import RequestXml
 
 
 class RequestHandler(object):
-    Allow = ["OPTIONS",
-             "PROPFIND",
-             "HEAD",
-             "GET",
-             "PUT",
-             "MKCOL",
-             "DELETE",
-             "COPY",
-             "MOVE",
-             "PROPPATCH"]
-
     def __init__(self, backend):
         self.backend = backend
 
@@ -45,15 +37,21 @@ class RequestHandler(object):
                 return func(host, path, headers, body)
             except:
                 import traceback
-                print traceback.format_exc()
+                print(traceback.format_exc(), file=sys.stderr)
 
                 return response.Response(status.INTERVAL_SERVER_ERROR)
         else:
             return response.Response(status.NOT_IMPLEMENTED)
 
     def do_OPTIONS(self, host, path, headers, body):
+        methods = []
+
+        for method in dir(self):
+            if method.startswith("do_"):
+                methods.append(method[3:])
+
         return response.Response(status.OK,
-                                 {"Allow": ",".join(RequestHandler.Allow)})
+                                 {"Allow": ",".join(methods)})
 
     def do_PROPFIND(self, host, path, headers, body):
         # RFC says, we should default to "infinity" if Depth header not given
