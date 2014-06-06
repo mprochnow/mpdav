@@ -107,35 +107,35 @@ class FileBackend(object):
             name = self._build_displayname(p)
             is_dir = os.path.isdir(p)
 
-            for property_ in request_xml.find("propfind", "prop"):
-                if property_ == "resourcetype":
+            for property_ in request_xml.find("{DAV:}propfind", "{DAV:}prop"):
+                if property_ == "{DAV:}resourcetype":
                     prop_stat.add_resourcetype(is_dir)
 
-                elif property_ == "creationdate":
+                elif property_ == "{DAV:}creationdate":
                     prop_stat.add_creationdate(epoch2iso8601(st.st_ctime))
 
-                elif property_ == "displayname":
+                elif property_ == "{DAV:}displayname":
                     prop_stat.add_displayname(name)
 
-                elif property_ == "getcontentlength":
+                elif property_ == "{DAV:}getcontentlength":
                     if not is_dir:
                         prop_stat.add_getcontentlength(st.st_size)
 
-                elif property_ == "getcontenttype":
+                elif property_ == "{DAV:}getcontenttype":
                     if not is_dir:
                         ct = mimetypes.guess_type(p)[0] or "application/octet-stream"
                         prop_stat.add_getcontenttype(ct)
 
-                elif property_ == "getetag":
+                elif property_ == "{DAV:}getetag":
                     prop_stat.add_getetag(md5.new("%s%s" % (name.encode("utf-8"), st.st_mtime)).hexdigest())
 
-                elif property_ == "getlastmodified":
+                elif property_ == "{DAV:}getlastmodified":
                     prop_stat.add_getlastmodified(epoch2iso1123(st.st_mtime))
 
-                elif property_ == "quota-available-bytes":
+                elif property_ == "{DAV:}quota-available-bytes":
                     prop_stat.add_quota_available_bytes(fs_st.f_bavail * fs_st.f_frsize)
 
-                elif property_ == "quota-used-bytes":
+                elif property_ == "{DAV:}quota-used-bytes":
                     prop_stat.add_quota_used_bytes((fs_st.f_blocks - fs_st.f_bavail) * fs_st.f_frsize)
 
                 else:

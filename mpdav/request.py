@@ -20,10 +20,31 @@ from __future__ import print_function
 import sys
 import urllib
 import urlparse
+import xml.etree.ElementTree as etree
 
 import response
 import status
-from davxml import RequestXml
+
+
+class RequestXml(object):
+    def __init__(self, xml):
+        self.root = etree.fromstring(xml)
+
+    def find(self, *args):
+        return self._walk(self.root, args)
+
+    def _walk(self, element, path):
+        if element.tag == path[0]:
+            path = path[1:]
+            if not path:
+                return [child.tag for child in element]
+
+            for child in element:
+                r = self._walk(child, path)
+                if r is not None:
+                    return r
+
+        return None
 
 
 class RequestHandler(object):
