@@ -25,7 +25,7 @@ class DavWsgiApp(object):
         self.dav = mpdav.RequestHandler(mpdav.FileBackend("."))
 
     def __call__(self, environ, start_response):
-        method = environ["REQUEST_METHOD"]
+        method = environ["REQUEST_METHOD"].lower()
         host = environ["HTTP_HOST"]
         path = environ["PATH_INFO"].decode("utf-8")
         headers = self._build_headers(environ)

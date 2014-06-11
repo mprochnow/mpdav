@@ -64,17 +64,17 @@ class RequestHandler(object):
         else:
             return response.Response(status.NOT_IMPLEMENTED)
 
-    def do_OPTIONS(self, host, path, headers, body):
+    def do_options(self, host, path, headers, body):
         methods = []
 
         for method in dir(self):
             if method.startswith("do_"):
-                methods.append(method[3:])
+                methods.append(method[3:].upper())
 
         return response.Response(status.OK,
                                  {"Allow": ",".join(methods)})
 
-    def do_PROPFIND(self, host, path, headers, body):
+    def do_propfind(self, host, path, headers, body):
         # RFC says, we should default to "infinity" if Depth header not given
         # but RFC says also that we do not need to support "inifity" for
         # performance or security reasons. So we default to "1".
@@ -91,13 +91,13 @@ class RequestHandler(object):
         except IOError:
             return response.Response(status.NOT_FOUND)
 
-    def do_HEAD(self, host, path, headers, body):
+    def do_head(self, host, path, headers, body):
         return self.backend.head(path)
 
-    def do_GET(self, host, path, headers, body):
+    def do_get(self, host, path, headers, body):
         return self.backend.get(path)
 
-    def do_PUT(self, host, path, headers, body):
+    def do_put(self, host, path, headers, body):
         content_length = headers.get("Content-Length")
         if content_length is not None:
             if content_length:
@@ -109,13 +109,13 @@ class RequestHandler(object):
         else:
             return response.Response(status.LENGTH_REQUIRED)
 
-    def do_MKCOL(self, host, path, headers, body):
+    def do_mkcol(self, host, path, headers, body):
         return self.backend.mkcol(path)
 
-    def do_DELETE(self, host, path, headers, body):
+    def do_delete(self, host, path, headers, body):
         return self.backend.delete(path)
 
-    def do_MOVE(self, host, path, headers, body):
+    def do_move(self, host, path, headers, body):
         overwrite = headers.get("Overwrite", "T")
         if overwrite not in ("T", "F"):
             return response.Response(status.BAD_REQUEST)
@@ -133,7 +133,7 @@ class RequestHandler(object):
 
         return self.backend.move(path, dest_path, overwrite == "T")
 
-    def do_COPY(self, host, path, headers, body):
+    def do_copy(self, host, path, headers, body):
         overwrite = headers.get("Overwrite", "T")
         if overwrite not in ("T", "F"):
             return response.Response(status.BAD_REQUEST)
@@ -151,5 +151,5 @@ class RequestHandler(object):
 
         return self.backend.copy(path, dest_path, overwrite == "T")
 
-    def do_PROPPATCH(self, path, headers, body):
+    def do_proppatch(self, path, headers, body):
         return response.Response(status.NOT_IMPLEMENTED)
