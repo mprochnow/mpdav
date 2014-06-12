@@ -58,9 +58,10 @@ class FileIterator(object):
 
 
 class FileBackend(object):
-    def __init__(self, root, show_hidden=False):
+    def __init__(self, root, show_hidden=False, base_path="/"):
         self.root = os.path.abspath(root)
         self.show_hidden = show_hidden
+        self.base_path = base_path.rstrip("/")
 
     def propfind(self, path, depth, request_xml):
         # TODO implement support for allprop
@@ -141,7 +142,9 @@ class FileBackend(object):
                 else:
                     print "Request for not supported property %s" % property_
 
-            result.append(multi_status.Response(p[len(self.root):], prop_stat))
+            href = self.base_path + p[len(self.root):]
+
+            result.append(multi_status.Response(href, prop_stat))
 
         return result
 
