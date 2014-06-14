@@ -22,7 +22,7 @@ import mpdav
 
 class DavWsgiApp(object):
     def __init__(self):
-        self.dav = mpdav.RequestHandler(mpdav.FileBackend("."))
+        self.dav = mpdav.WebDavRequestHandler(mpdav.FileBackend("data"))
 
     def __call__(self, environ, start_response):
         method = environ["REQUEST_METHOD"].lower()

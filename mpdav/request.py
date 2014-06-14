@@ -47,7 +47,7 @@ class RequestXml(object):
         return None
 
 
-class RequestHandler(object):
+class WebDavRequestHandler(object):
     def __init__(self, backend):
         self.backend = backend
 

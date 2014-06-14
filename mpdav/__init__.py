@@ -16,5 +16,5 @@
 # along with mpdav.  If not, see <http://www.gnu.org/licenses/>.
 
 from headers_dict import HeadersDict
-from request import RequestHandler
+from request import WebDavRequestHandler
 from file_backend import FileBackend
