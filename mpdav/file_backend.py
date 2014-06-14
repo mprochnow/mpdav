@@ -287,8 +287,15 @@ class FileBackend(object):
         return response.Response(status.NO_CONTENT)
 
     def move(self, src, dst, overwrite):
-        source = os.path.abspath(os.path.join(self.root, src.strip("/")))
-        destination = os.path.abspath(os.path.join(self.root, dst.strip("/")))
+        if not dst.startswith(self.base_path):
+            return response.Response(status.FORBIDDEN)
+
+        source = os.path.join(self.root, src.strip("/"))
+        source = os.path.abspath(source)
+
+        destination = dst[len(self.base_path):]
+        destination = os.path.join(self.root, destination.strip("/"))
+        destination = os.path.abspath(destination)
 
         if not source.startswith(self.root) or not destination.startswith(self.root):
             return response.Response(status.FORBIDDEN)
@@ -317,8 +324,15 @@ class FileBackend(object):
             return response.Response(status.NO_CONTENT)
 
     def copy(self, src, dst, overwrite):
-        source = os.path.abspath(os.path.join(self.root, src.strip("/")))
-        destination = os.path.abspath(os.path.join(self.root, dst.strip("/")))
+        if not dst.startswith(self.base_path):
+            return response.Response(status.BAD_REQUEST)
+
+        source = os.path.join(self.root, src.strip("/"))
+        source = os.path.abspath(source)
+
+        destination = dst[len(self.base_path):]
+        destination = os.path.join(self.root, destination.strip("/"))
+        destination = os.path.abspath(destination)
 
         if not source.startswith(self.root) or not destination.startswith(self.root):
             return response.Response(status.FORBIDDEN)
