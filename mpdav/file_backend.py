@@ -211,7 +211,7 @@ class FileBackend(object):
 
         for f in filenames:
             p = os.path.join(path, f)
-            href = p[len(self.root):]
+            href = self.base_path + p[len(self.root):]
 
             if os.path.isdir(p):
                 result += tplDirectory % (href, f)
