@@ -178,7 +178,7 @@ class FileBackend(object):
         else:
             st = os.stat(filename)
 
-            headers = {"Content-Type": mimetypes.guess_type("filename")[0] or "application/octet-stream",
+            headers = {"Content-Type": mimetypes.guess_type(filename)[0] or "application/octet-stream",
                        "Content-Length": str(st.st_size)}
 
             return response.Response(status.OK,
